@@ -1,0 +1,247 @@
+import React, { useState } from "react";
+import {
+  FlatList,
+  Image,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { styles } from "./ToDoStyle";
+import { images } from "../../assets/images";
+import { icons } from "../../assets/icons";
+import { Text } from "react-native-gesture-handler";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStack } from "../navigation/StackNavigator";
+
+interface todayprop {
+  navigation: StackNavigationProp<RootStack, "Todo">;
+}
+
+interface detail {
+  id: string;
+  title: string;
+  priority: "High" | "Medium" | "Low";
+  status: "active" | "completed";
+  category: string;
+  durationSeconds: number;
+  remainingSeconds: number;
+  createdAt: string;
+}
+
+const initialTasks: detail[] = [
+  {
+    id: "1",
+    title: "Set up project structure",
+    priority: "High",
+    status: "completed",
+    category: "Setup",
+    durationSeconds: 300,
+    remainingSeconds: 0,
+    createdAt: "2024-01-15T08:00:00Z",
+  },
+  {
+    id: "2",
+    title: "Build navigation flow",
+    priority: "High",
+    status: "active",
+    category: "Development",
+    durationSeconds: 300,
+    remainingSeconds: 210,
+    createdAt: "2024-01-15T09:00:00Z",
+  },
+  {
+    id: "3",
+    title: "Design task card component",
+    priority: "Medium",
+    status: "active",
+    category: "UI",
+    durationSeconds: 300,
+    remainingSeconds: 145,
+    createdAt: "2024-01-15T09:30:00Z",
+  },
+  {
+    id: "4",
+    title: "Integrate AsyncStorage",
+    priority: "Medium",
+    status: "active",
+    category: "Development",
+    durationSeconds: 300,
+    remainingSeconds: 300,
+    createdAt: "2024-01-15T10:00:00Z",
+  },
+  {
+    id: "5",
+    title: "Write input validation logic",
+    priority: "High",
+    status: "active",
+    category: "Development",
+    durationSeconds: 300,
+    remainingSeconds: 60,
+    createdAt: "2024-01-15T10:30:00Z",
+  },
+  {
+    id: "6",
+    title: "Add search and filter UI",
+    priority: "Medium",
+    status: "active",
+    category: "UI",
+    durationSeconds: 300,
+    remainingSeconds: 180,
+    createdAt: "2024-01-15T11:00:00Z",
+  },
+  {
+    id: "7",
+    title: "Implement delete confirmation alert",
+    priority: "Low",
+    status: "active",
+    category: "UI",
+    durationSeconds: 300,
+    remainingSeconds: 90,
+    createdAt: "2024-01-15T11:30:00Z",
+  },
+  {
+    id: "8",
+    title: "Test countdown timer cleanup",
+    priority: "High",
+    status: "active",
+    category: "Testing",
+    durationSeconds: 300,
+    remainingSeconds: 255,
+    createdAt: "2024-01-15T12:00:00Z",
+  },
+  {
+    id: "9",
+    title: "Fix priority badge styling",
+    priority: "Low",
+    status: "completed",
+    category: "UI",
+    durationSeconds: 300,
+    remainingSeconds: 0,
+    createdAt: "2024-01-15T12:30:00Z",
+  },
+  {
+    id: "10",
+    title: "Code review and cleanup",
+    priority: "Medium",
+    status: "active",
+    category: "Review",
+    durationSeconds: 300,
+    remainingSeconds: 300,
+    createdAt: "2024-01-15T13:00:00Z",
+  },
+];
+
+interface itemProp {
+  item: detail;
+}
+const Item = ({ item }: itemProp) => {
+  return (
+    <View style={[styles.listView, styles.dropShadow]}>
+      <Text>{item.title}</Text>
+      <Text>{item.priority}</Text>
+      <Text>{item.status}</Text>
+      <Text>{item.title}</Text>
+    </View>
+  );
+};
+const ToDo = ({ navigation }: todayprop) => {
+  const [isActive, setIsActive] = useState(false);
+
+  const isToggle = () => {
+    setIsActive(!isActive);
+  };
+  return (
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ImageBackground
+          source={images.backgroundImg}
+          resizeMode="cover"
+          style={styles.bgImg}
+        >
+          <View style={styles.mainView}>
+            <View style={styles.topView}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Home");
+                }}
+              >
+                <Image source={icons.arrowLeft} />
+              </TouchableOpacity>
+              <Text style={styles.titleText}>Today's Tasks</Text>
+              <Image source={icons.notifications} />
+            </View>
+            <View style={styles.searchView}>
+              <TextInput placeholder="Search Title" style={styles.searchBar} />
+              <TouchableOpacity style={styles.addBtn}>
+                <Text style={styles.addText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.trioBtnView}>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  isActive ? styles.selectedBtn : styles.diableBtn,
+                ]}
+                onPress={isToggle}
+              >
+                <Text
+                  style={[
+                    styles.selectionText,
+                    isActive ? styles.selectedText : styles.disableText,
+                  ]}
+                >
+                  All
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  isActive ? styles.selectedBtn : styles.diableBtn,
+                ]}
+                onPress={isToggle}
+              >
+                <Text
+                  style={[
+                    styles.selectionText,
+                    isActive ? styles.selectedText : styles.disableText,
+                  ]}
+                >
+                  Active
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  isActive ? styles.selectedBtn : styles.diableBtn,
+                ]}
+                onPress={isToggle}
+              >
+                <Text
+                  style={[
+                    styles.selectionText,
+                    isActive ? styles.selectedText : styles.disableText,
+                  ]}
+                >
+                  Completed
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={initialTasks}
+              renderItem={({ item }) => <Item item={item} />}
+            />
+          </View>
+        </ImageBackground>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+export default ToDo;

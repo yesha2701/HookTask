@@ -1,20 +1,37 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { Image, ImageBackground, ScrollView, Text, TouchableOpacity } from "react-native";
+import { styles } from "./HomeStyle";
+import { images } from "../../assets/images";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { icons } from "../../assets/icons";
+import {StackNavigationProp} from "@react-navigation/stack";
+import { RootStack } from "../navigation/StackNavigator";
 
-const Home = () => {
-    return (
-        <View style={styles.container}>
-            <Text>Home</Text>
-        </View>
-    );
+interface HomeScreen {
+  navigation:StackNavigationProp<RootStack,'Home'>
+}
+const Home = ({navigation}:HomeScreen) => {
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          <ImageBackground
+          source={images.backgroundImg}
+          resizeMode="cover"
+          style={styles.bgImg}
+        >
+          <Image source={images.female} style={styles.femaleImg} />
+          <Text style={styles.onBoardText}>Task Management & To-Do List</Text>
+          <Text style={styles.subText}>This productive tool is designed to help you better manage your task project-wise conveniently!</Text>
+          <TouchableOpacity style={styles.startBtn} onPress={()=>{navigation.navigate("Todo")}}>
+            <Text style={styles.btnText}>Let's Start</Text>
+            <Image source={icons.arrowRight} style={styles.arrowRight}/>
+          </TouchableOpacity>
+        </ImageBackground>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#2c3e50',
-    },
-});
 export default Home;
