@@ -37,12 +37,15 @@ export const styles = StyleSheet.create({
         paddingHorizontal:horizontalScale(30),
         paddingVertical:verticalScale(15),
         borderRadius:moderateScale(14),
+        justifyContent: 'space-between',
+        marginHorizontal: horizontalScale(20)
     },
     btnText:{
         color:colors.white,
         fontSize:moderateScale(20),
         fontWeight:"bold",
-        marginLeft:horizontalScale(60),
+        textAlign: 'center',
+        flex: 1,
     },
     arrowRight:{
         height:moderateScale(25),

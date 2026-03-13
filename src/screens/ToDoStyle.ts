@@ -9,7 +9,6 @@ export const styles = StyleSheet.create({
     },
     bgImg:{
         flex:1,
-        // alignItems: 'center',
         justifyContent:"center"
     },
     mainView:{
@@ -79,14 +78,73 @@ export const styles = StyleSheet.create({
         color:colors.Primary,    
     },
     listView:{
-        padding:moderateScale(30),
+        padding:moderateScale(20),
         marginVertical:verticalScale(10),
         backgroundColor:colors.offWhite,
         borderRadius:moderateScale(15),
+        flexDirection:"row",
+        justifyContent:"space-between",
     },
     dropShadow:{
         shadowColor:colors.shadow,
         shadowOffset:{height:4,width:0},
         shadowOpacity:32,
-    }
+    },
+    infoView:{
+        justifyContent:"space-between",
+    },
+    infoText:{
+        fontSize:moderateScale(14),
+        fontWeight:"500",
+    },
+    logoIconView:{
+        paddingBottom:verticalScale(10)
+    },
+    iconView:{
+        borderRadius:moderateScale(7),
+        marginHorizontal:horizontalScale(14),
+    },
+    statusIcon:{
+        margin:moderateScale(6)
+    },
+    activeIcon:{
+        backgroundColor:colors.lightPurple,
+    },
+    completeIcon:{
+        backgroundColor:colors.babyPink,
+    },
+    priorityView:{
+        alignItems:"center",
+        borderRadius:moderateScale(7),
+        paddingVertical:verticalScale(2),
+        paddingHorizontal:horizontalScale(7)
+    },
+    priorityText:{
+        fontSize:moderateScale(11),
+    },
+    highText:{
+        color:colors.Primary,
+    },
+    mediumText:{
+        color:colors.orange,
+    },
+    lowText:{
+        color:colors.primaryBlue,
+    },
+    highBg:{
+        backgroundColor:colors.lightPurple,
+    },
+    mediumBg:{
+        backgroundColor:colors.lightOrange,
+    },
+    lowBg:{
+        backgroundColor:colors.lightPrimaryBlue
+    },
+    dateView:{
+        flexDirection:"row"
+    },
+    dateText:{
+        alignSelf:"center",
+        color:colors.Primary,
+    },
 });

@@ -16,6 +16,7 @@ import { icons } from "../../assets/icons";
 import { Text } from "react-native-gesture-handler";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStack } from "../navigation/StackNavigator";
+import Moment from "moment";
 
 interface todayprop {
   navigation: StackNavigationProp<RootStack, "Todo">;
@@ -138,13 +139,66 @@ const initialTasks: detail[] = [
 interface itemProp {
   item: detail;
 }
+const isComplete = (status: "active" | "completed") => {
+  if (status === "active") {
+    return icons.check;
+  } else {
+    return icons.checked;
+  }
+};
+
+const iconBg = (status: "active" | "completed") => {
+  if (status === "active") {
+    return styles.activeIcon;
+  } else {
+    return styles.completeIcon;
+  }
+};
+
+const isPriority = (priority: "High" | "Medium" | "Low") => {
+  if (priority === "High") {
+    return styles.highText;
+  } else if (priority === "Medium") {
+    return styles.mediumText;
+  } else {
+    return styles.lowText;
+  }
+};
+
+const prioBackground = (priority: "High" | "Medium" | "Low") => {
+  if (priority === "High") {
+    return styles.highBg;
+  } else if (priority === "Medium") {
+    return styles.mediumBg;
+  } else {
+    return styles.lowBg;
+  }
+};
+
 const Item = ({ item }: itemProp) => {
+  const fomatDate = Moment(item.createdAt).format("DD/MM/YYYY");
+
   return (
     <View style={[styles.listView, styles.dropShadow]}>
-      <Text>{item.title}</Text>
-      <Text>{item.priority}</Text>
-      <Text>{item.status}</Text>
-      <Text>{item.title}</Text>
+      <View style={styles.infoView}>
+        <Text style={styles.infoText}>{item.title}</Text>
+        <View style={styles.dateView}>
+          <Image source={icons.calender} />
+          <Text style={styles.dateText}>{fomatDate}</Text>
+        </View>
+      </View>
+      <View>
+        <View style={styles.logoIconView}>
+          <View style={[iconBg(item.status), styles.iconView]}>
+            <Image source={isComplete(item.status)} style={styles.statusIcon} />
+          </View>
+        </View>
+        <View style={[styles.priorityView, prioBackground(item.priority)]}>
+          <Text style={[styles.priorityText, isPriority(item.priority)]}>
+            {item.priority}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -154,6 +208,17 @@ const ToDo = ({ navigation }: todayprop) => {
   const isToggle = () => {
     setIsActive(!isActive);
   };
+
+  const stackNavigator = () => {
+    return navigation.goBack();
+  };
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredList = initialTasks.filter((task) => {
+    return task.title.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -167,18 +232,20 @@ const ToDo = ({ navigation }: todayprop) => {
         >
           <View style={styles.mainView}>
             <View style={styles.topView}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("Home");
-                }}
-              >
+              <TouchableOpacity onPress={stackNavigator}>
                 <Image source={icons.arrowLeft} />
               </TouchableOpacity>
               <Text style={styles.titleText}>Today's Tasks</Text>
               <Image source={icons.notifications} />
             </View>
             <View style={styles.searchView}>
-              <TextInput placeholder="Search Title" style={styles.searchBar} />
+              <TextInput
+                value={searchQuery}
+                placeholder="Search Title"
+                style={styles.searchBar}
+                clearButtonMode="always"
+                onChangeText={(text) => setSearchQuery(text)}
+              />
               <TouchableOpacity style={styles.addBtn}>
                 <Text style={styles.addText}>Add</Text>
               </TouchableOpacity>
@@ -234,7 +301,7 @@ const ToDo = ({ navigation }: todayprop) => {
               </TouchableOpacity>
             </View>
             <FlatList
-              data={initialTasks}
+              data={filteredList}
               renderItem={({ item }) => <Item item={item} />}
             />
           </View>
