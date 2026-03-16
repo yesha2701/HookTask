@@ -5,19 +5,17 @@
  * @format
  */
 
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-} from 'react-native-safe-area-context';
+import { StatusBar, StyleSheet, useColorScheme } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 // import Home from './src/screens/Home';
-import StackNavigator from './src/navigation/StackNavigator';
+import StackNavigator from "./src/navigation/StackNavigator";
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === "dark";
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
       <AppContent />
     </SafeAreaProvider>
   );
@@ -25,9 +23,9 @@ function App() {
 
 function AppContent() {
   return (
-    <View style={styles.container}>
-      <StackNavigator/>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <StackNavigator />
+    </SafeAreaView>
   );
 }
 

@@ -17,7 +17,6 @@ import { Text } from "react-native-gesture-handler";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStack } from "../navigation/StackNavigator";
 import Moment from "moment";
-
 interface todayprop {
   navigation: StackNavigationProp<RootStack, "Todo">;
 }
@@ -136,6 +135,8 @@ const initialTasks: detail[] = [
   },
 ];
 
+const btnStatus = ["All", "active", "completed"];
+
 interface itemProp {
   item: detail;
 }
@@ -203,24 +204,34 @@ const Item = ({ item }: itemProp) => {
   );
 };
 const ToDo = ({ navigation }: todayprop) => {
-  const [isActive, setIsActive] = useState(false);
-
-  const isToggle = () => {
-    setIsActive(!isActive);
-  };
+  const [isActive, setIsActive] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const stackNavigator = () => {
     return navigation.goBack();
   };
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const addNavigator = () => {
+    return navigation.navigate("AddTask");
+  };
 
   const filteredList = initialTasks.filter((task) => {
-    return task.title.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
 
+    const matchesFilter =
+      isActive === "All"
+        ? true
+        : isActive === "active"
+        ? task.status === "active"
+        : task.status === "completed";
+
+    return matchesSearch && matchesFilter;
+  });
+  
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -246,59 +257,29 @@ const ToDo = ({ navigation }: todayprop) => {
                 clearButtonMode="always"
                 onChangeText={(text) => setSearchQuery(text)}
               />
-              <TouchableOpacity style={styles.addBtn}>
+              <TouchableOpacity style={styles.addBtn} onPress={addNavigator}>
                 <Text style={styles.addText}>Add</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.trioBtnView}>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  isActive ? styles.selectedBtn : styles.diableBtn,
-                ]}
-                onPress={isToggle}
-              >
-                <Text
+              {btnStatus.map((x) => (
+                <TouchableOpacity
                   style={[
-                    styles.selectionText,
-                    isActive ? styles.selectedText : styles.disableText,
+                    styles.button,
+                    isActive === x ? styles.selectedBtn : styles.diableBtn,
                   ]}
+                  onPress={() => setIsActive(x)}
                 >
-                  All
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  isActive ? styles.selectedBtn : styles.diableBtn,
-                ]}
-                onPress={isToggle}
-              >
-                <Text
-                  style={[
-                    styles.selectionText,
-                    isActive ? styles.selectedText : styles.disableText,
-                  ]}
-                >
-                  Active
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  isActive ? styles.selectedBtn : styles.diableBtn,
-                ]}
-                onPress={isToggle}
-              >
-                <Text
-                  style={[
-                    styles.selectionText,
-                    isActive ? styles.selectedText : styles.disableText,
-                  ]}
-                >
-                  Completed
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.selectionText,
+                      isActive === x ? styles.selectedText : styles.disableText,
+                    ]}
+                  >
+                    {x}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
             <FlatList
               data={filteredList}
@@ -307,7 +288,7 @@ const ToDo = ({ navigation }: todayprop) => {
           </View>
         </ImageBackground>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 

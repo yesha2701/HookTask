@@ -62,8 +62,8 @@ export const styles = StyleSheet.create({
         alignItems:"center",
     },
     selectionText:{
-        fontSize:moderateScale(16),
-        fontWeight:"600",
+        fontSize:moderateScale(14),
+        fontWeight:"500",
     },
     selectedBtn:{
         backgroundColor:colors.Primary,  
