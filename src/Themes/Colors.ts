@@ -11,5 +11,6 @@ export const colors = {
     orange:'#FF7D53',
     primaryBlue:'#0087FF',
     lightOrange:'#FFE9E1',
-    lightPrimaryBlue:'#E3F2FF'
+    lightPrimaryBlue:'#E3F2FF',
+    red:'red',
 };

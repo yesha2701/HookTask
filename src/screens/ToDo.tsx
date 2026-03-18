@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   Image,
   ImageBackground,
@@ -9,17 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./ToDoStyle";
 import { images } from "../../assets/images";
 import { icons } from "../../assets/icons";
 import { Text } from "react-native-gesture-handler";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStack } from "../navigation/StackNavigator";
 import Moment from "moment";
-interface todayprop {
-  navigation: StackNavigationProp<RootStack, "Todo">;
-}
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 interface detail {
   id: string;
@@ -32,7 +28,7 @@ interface detail {
   createdAt: string;
 }
 
-const initialTasks: detail[] = [
+const initialTasks = [
   {
     id: "1",
     title: "Set up project structure",
@@ -136,7 +132,6 @@ const initialTasks: detail[] = [
 ];
 
 const btnStatus = ["All", "active", "completed"];
-
 interface itemProp {
   item: detail;
 }
@@ -176,8 +171,8 @@ const prioBackground = (priority: "High" | "Medium" | "Low") => {
   }
 };
 
-const Item = ({ item }: itemProp) => {
-  const fomatDate = Moment(item.createdAt).format("DD/MM/YYYY");
+const Item = ({ item }) => {
+  const fomatDate = Moment(item.createdAt)?.format("DD/MM/YYYY");
 
   return (
     <View style={[styles.listView, styles.dropShadow]}>
@@ -203,7 +198,22 @@ const Item = ({ item }: itemProp) => {
     </View>
   );
 };
-const ToDo = ({ navigation }: todayprop) => {
+const ToDo = () => {
+  const navigation=useNavigation()
+  const route = useRoute();
+  const newData = route.params;
+  // initialTasks.push(newData)
+  // console.log('initialTasks :>> ', initialTasks);
+  // useEffect(()=>{
+    // const identical = initialTasks.map(x=>x.id);
+    // console.log('identical :>> ', identical);
+  // if(identical === newData.id){
+  //   Alert.alert("Id Already Existed");
+  // }else{
+    initialTasks.push(newData);
+  // }
+  // },[initialTasks,newData])
+
   const [isActive, setIsActive] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -216,16 +226,14 @@ const ToDo = ({ navigation }: todayprop) => {
   };
 
   const filteredList = initialTasks.filter((task) => {
-    const matchesSearch = task.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesSearch = task?.title?.toLowerCase()?.includes(searchQuery.toLowerCase());
 
     const matchesFilter =
       isActive === "All"
         ? true
         : isActive === "active"
-        ? task.status === "active"
-        : task.status === "completed";
+        ? task?.status === "active"
+        : task?.status === "completed";
 
     return matchesSearch && matchesFilter;
   });

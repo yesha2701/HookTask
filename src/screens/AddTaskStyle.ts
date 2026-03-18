@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     },
     inputView:{
         flex:1,
-        rowGap:verticalScale(7)
+        rowGap:verticalScale(4)
     },
     text:{
         fontSize:moderateScale(16),
@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
         flexDirection:"row",
         alignItems:"center",
         backgroundColor:colors.Primary,
-        marginTop:verticalScale(50),
+        marginTop:verticalScale(30),
         paddingHorizontal:horizontalScale(30),
         paddingVertical:verticalScale(15),
         borderRadius:moderateScale(14),
@@ -62,4 +62,30 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         flex: 1,
     },
+    dateView:{
+        flexDirection:'row',
+        justifyContent:"space-around",
+        gap:moderateScale(20),
+    },
+    cancelbtn:{
+        flex:1,
+        paddingVertical:verticalScale(10),
+        borderRadius:moderateScale(9),
+        alignItems:"center",
+       backgroundColor:colors.lightPurple,
+    },
+    textCancel:{
+        fontSize:moderateScale(14),
+        fontWeight:"500",
+        color:colors.Primary,
+    },
+     selectedBtn:{
+        backgroundColor:colors.Primary,  
+    },
+    selectedText:{
+        color:colors.white,
+    },
+    errorText:{
+        color:colors.red,
+    }
 });

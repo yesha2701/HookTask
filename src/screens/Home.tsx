@@ -11,14 +11,10 @@ import { styles } from "./HomeStyle";
 import { images } from "../../assets/images";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { icons } from "../../assets/icons";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStack } from "../navigation/StackNavigator";
+import { useNavigation } from "@react-navigation/native";
 
-interface HomeScreen {
-  navigation: StackNavigationProp<RootStack, "Home">;
-}
-
-const Home = ({ navigation }: HomeScreen) => {
+const Home = () => {
+  const navigation = useNavigation();
   const stackNavigator = () => {
     return navigation.navigate("Todo");
   };

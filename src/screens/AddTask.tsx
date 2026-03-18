@@ -3,23 +3,21 @@ import {
   View,
   Text,
   TouchableOpacity,
-  KeyboardAvoidingView,
   Platform,
   ImageBackground,
   Image,
   TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { styles } from "./AddTaskStyle";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStack } from "../navigation/StackNavigator";
 import { images } from "../../assets/images";
 import { icons } from "../../assets/icons";
 import { Dropdown } from "react-native-element-dropdown";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
-interface addDetail {
-  navigation: StackNavigationProp<RootStack, "AddTask">;
-}
 
 const Options = [
   { label: "High", value: "High" },
@@ -28,87 +26,232 @@ const Options = [
 ];
 
 const statusOpt = [
-  { label: "Active", value: "Active" },
-  { label: "Completed", value: "Completed" },
+  { label: "active", value: "active" },
+  { label: "completed", value: "completed" },
 ];
 
-const AddTask = ({ navigation }: addDetail) => {
+const AddTask = () => {
+  const navigation =useNavigation()
+  const route = useRoute()
   const backNavigation = () => {
     return navigation.goBack();
   };
-  const [priorities, setPriorities] = useState();
-  const [statusActive, setStatusActive] = useState<string>();
+
+  const [id, setId] = useState("");
+  const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState("");
+  const [status, setStatus] = useState("");
+  const [category, setCategory] = useState("");
+  const [duration, setDuration] = useState("");
+  const [remaining, setRemaining] = useState("");
+  const [errors, setErrors] = useState({ field: "", message: "" });
+
+  const validationForm = () => {
+    let formError = { field: "", message: "" };
+
+    if (id === "") {
+      formError.field = "id";
+      formError.message = "Id is Required";
+      setErrors(formError);
+    } else if (title === "") {
+      formError.field = "title";
+      formError.message = "Title is Required";
+      setErrors(formError);
+    } else if (priority ===  "" || priority === undefined) {
+      formError.field = "priority";
+      formError.message = "Priority is Required to select";
+      setErrors(formError);
+    } else if (status ===  "" || status === undefined) {
+      formError.field = "status";
+      formError.message = "status is Required to select";
+      setErrors(formError);
+    }else if (category === "") {
+      formError.field = "category";
+      formError.message = "category is Required";
+      setErrors(formError);
+    } else if (duration === "") {
+      formError.field = "duration";
+      formError.message = "duration is Required";
+      setErrors(formError);
+    } else if (remaining === "") {
+      formError.field = "remaining";
+      formError.message = "remaining is Required";
+      setErrors(formError);
+    } else {
+      setErrors({ field: "", message: "" });
+      handleOnGoBack();
+    }
+  };
+
+  const handleOnGoBack = () => {
+    const multiParam = {
+      id: id,
+      title: title,
+      priority: priority,
+      status: status,
+      category:category,
+      durationSeconds:duration,
+      remainingSeconds:remaining,
+      createdAt:formattedDate
+    }
+    
+    return navigation.navigate("Todo", multiParam);
+  };
+
+  const [date, setDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+
+  const showDatePicker = () => {
+    setShowPicker(true);
+  };
+
+  const hideDatePicker = () => {
+    setShowPicker(false);
+  };
+
+  const handleConfirm = (selectedDate: Date) => {
+    setDate(selectedDate);
+    hideDatePicker();
+  };
+
+  const formattedDate = date.toLocaleDateString();
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <KeyboardAvoidingView
+      <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <ImageBackground
-          source={images.backgroundImg}
-          resizeMode="cover"
-          style={styles.bgImg}
-        >
-          <View style={styles.mainView}>
-            <View style={styles.topView}>
-              <TouchableOpacity onPress={backNavigation}>
-                <Image source={icons.arrowLeft} />
+        <ScrollView>
+          errors
+          <ImageBackground
+            source={images.backgroundImg}
+            resizeMode="cover"
+            style={styles.bgImg}
+          >
+            <View style={styles.mainView}>
+              <View style={styles.topView}>
+                <TouchableOpacity onPress={backNavigation}>
+                  <Image source={icons.arrowLeft} />
+                </TouchableOpacity>
+                <Text style={styles.titleText}>Add Tasks</Text>
+                <Image source={icons.notifications} />
+              </View>
+              <View style={styles.inputView}>
+                <Text style={styles.text}>Id</Text>
+                <TextInput
+                  placeholder="Enter Your id"
+                  value={id}
+                  style={styles.textInput}
+                  onChangeText={setId}
+                />
+                {errors.field === "id" && (
+                  <Text style={styles.errorText}>{errors.message}</Text>
+                )}
+                <Text style={styles.text}>Title</Text>
+                <TextInput
+                  placeholder="Enter Title"
+                  style={styles.textInput}
+                  value={title}
+                  onChangeText={setTitle}
+                />
+                {errors.field === "title" && (
+                  <Text style={styles.errorText}>{errors.message}</Text>
+                )}
+                <Text style={styles.text}>Priority</Text>
+                <View>
+                  <Dropdown
+                    data={Options}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select Priority"
+                    value={priority}
+                    onChange={(item) => {
+                      setPriority(item.value);
+                      setErrors({ field: "", message: "" });
+                    }}
+                    style={styles.textInput}
+                    placeholderStyle={styles.placeholderStyle}
+                  />
+                  {errors.field === "priority" && (
+                  <Text style={styles.errorText}>{errors.message}</Text>
+                )}
+                </View>
+                <Text style={styles.text}>Status</Text>
+                <View>
+                  <Dropdown
+                    data={statusOpt}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select Status"
+                    value={status}
+                    onChange={(item) => {
+                      setStatus(item.value);
+                      setErrors({ field: "", message: "" });
+                    }}
+                    style={styles.textInput}
+                    placeholderStyle={styles.placeholderStyle}
+                  />
+                  {errors.field === "status" && (
+                  <Text style={styles.errorText}>{errors.message}</Text>
+                )}
+                </View>
+                <Text style={styles.text}>Category</Text>
+                <TextInput
+                  placeholder="Enter Category"
+                  style={styles.textInput}
+                  value={category}
+                  onChangeText={setCategory}
+                />
+                {errors.field === "category" && (
+                  <Text style={styles.errorText}>{errors.message}</Text>
+                )}
+                <Text style={styles.text}>DurationSeconds</Text>
+                <TextInput
+                  placeholder="Enter durationSeconds"
+                  style={styles.textInput}
+                  value={duration}
+                  onChangeText={setDuration}
+                />
+                {errors.field === "duration" && (
+                  <Text style={styles.errorText}>{errors.message}</Text>
+                )}
+                <Text style={styles.text}>RemainingSeconds</Text>
+                <TextInput
+                  placeholder="Enter remainingSeconds"
+                  style={styles.textInput}
+                  value={remaining}
+                  onChangeText={setRemaining}
+                />
+                {errors.field === "remaining" && (
+                  <Text style={styles.errorText}>{errors.message}</Text>
+                )}
+                <Text style={styles.text}>CreatedAt</Text>
+                <TextInput
+                  style={styles.textInput}
+                  onPress={showDatePicker}
+                  value={formattedDate}
+                  placeholder="Select date and time"
+                  editable={false}
+                />
+
+                <DateTimePickerModal
+                  isVisible={showPicker}
+                  mode="datetime"
+                  onConfirm={handleConfirm}
+                  onCancel={hideDatePicker}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.startBtn}
+                onPress={validationForm}
+              >
+                <Text style={styles.btnText}>Submit</Text>
               </TouchableOpacity>
-              <Text style={styles.titleText}>Add Tasks</Text>
-              <Image source={icons.notifications} />
             </View>
-            <View style={styles.inputView}>
-              <Text style={styles.text}>Id</Text>
-              <TextInput placeholder="Enter Your id" style={styles.textInput} />
-              <Text style={styles.text}>Title</Text>
-              <TextInput placeholder="Enter Title" style={styles.textInput} />
-              <Text style={styles.text}>Priority</Text>
-              <View>
-                 <Dropdown
-                  data={Options}
-                  labelField="label"
-                  valueField="value"
-                  placeholder="Select Priority"
-                  value={priorities}
-                  onChange={(item) => {
-                    setPriorities(item.value);
-                  }}
-                  style={styles.textInput}
-                  placeholderStyle={styles.placeholderStyle}
-                />
-              </View>
-              <Text style={styles.text}>Status</Text>
-              <View>
-                 <Dropdown
-                  data={statusOpt}
-                  labelField="label"
-                  valueField="value"
-                  placeholder="Select Status"
-                  value={statusActive}
-                  onChange={(item) => {
-                    setStatusActive(item.value);
-                  }}
-                  style={styles.textInput}
-                  placeholderStyle={styles.placeholderStyle}
-                />
-              </View>
-              <Text style={styles.text}>Category</Text>
-                <TextInput placeholder="Enter Category" style={styles.textInput}/>
-                <Text style={styles.text}>durationSeconds</Text>
-                <TextInput placeholder="Enter durationSeconds" style={styles.textInput}/>
-                <Text style={styles.text}>remainingSeconds</Text>
-                <TextInput placeholder="Enter remainingSeconds" style={styles.textInput}/>
-            </View>
-            <TouchableOpacity style={styles.startBtn}>
-                          <View/>
-                          <Text style={styles.btnText}>Submit</Text>
-                        </TouchableOpacity>
-          </View>
-        </ImageBackground>
+          </ImageBackground>
+        </ScrollView>
       </KeyboardAvoidingView>
-      </ScrollView>
     </View>
   );
 };
