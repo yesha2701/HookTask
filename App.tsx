@@ -5,20 +5,16 @@
  * @format
  */
 
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-} from 'react-native-safe-area-context';
-import Useref from './src/screens/Useref';
-// import Useeffect from './src/screens/Useeffect';
-// import Usestate from './src/screens/Usestate';
+import { StatusBar, StyleSheet, useColorScheme } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import StackNavigator from "./src/navigation/StackNavigator";
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === "dark";
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
       <AppContent />
     </SafeAreaProvider>
   );
@@ -26,9 +22,9 @@ function App() {
 
 function AppContent() {
   return (
-    <View style={styles.container}>
-      <Useref/>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <StackNavigator />
+    </SafeAreaView>
   );
 }
 
