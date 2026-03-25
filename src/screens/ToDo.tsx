@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
-  Alert,
+  Button,
   FlatList,
   Image,
   ImageBackground,
@@ -15,7 +15,14 @@ import { images } from "../../assets/images";
 import { icons } from "../../assets/icons";
 import { Text } from "react-native-gesture-handler";
 import Moment from "moment";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import AddModal from "../components/AddModal";
+import { ModalContext } from "./AddModalContext";
 
 interface detail {
   id: string;
@@ -199,20 +206,44 @@ const Item = ({ item }) => {
   );
 };
 const ToDo = () => {
-  const navigation=useNavigation()
+  const { isModalOpen, setIsModalOpen } = useContext(ModalContext);
+  const [newData,setNewData] = useState([])
+  const navigation = useNavigation();
   const route = useRoute();
-  const newData = route.params;
-  // initialTasks.push(newData)
-  // console.log('initialTasks :>> ', initialTasks);
-  // useEffect(()=>{
-    // const identical = initialTasks.map(x=>x.id);
-    // console.log('identical :>> ', identical);
-  // if(identical === newData.id){
-  //   Alert.alert("Id Already Existed");
-  // }else{
-    initialTasks.push(newData);
-  // }
-  // },[initialTasks,newData])
+
+  const storeExistedData = async () => {
+    // const existing = await AsyncStorage.getItem("user");
+    try{
+      // if (!existing) {
+        await AsyncStorage.setItem("user", JSON.stringify(initialTasks));
+      // }
+      }
+   catch (e) {
+      console.log("Error:", e);
+    }
+  };
+
+  const fetchUser = async () => {
+    try {
+      const addedData = await AsyncStorage.getItem("user");
+      console.log("addedData :>> ", addedData);
+      setNewData(JSON.parse(addedData));
+    } catch (e) {
+      console.log("Error:", e);
+    }
+  };
+
+  console.log('newData :>> ', newData);
+
+  useEffect(() => {
+    storeExistedData();
+  }, []);
+
+  useEffect(()=>{
+    if(!isModalOpen){
+      fetchUser()
+    }
+  },[isModalOpen])
 
   const [isActive, setIsActive] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -221,12 +252,10 @@ const ToDo = () => {
     return navigation.goBack();
   };
 
-  const addNavigator = () => {
-    return navigation.navigate("AddTask");
-  };
-
-  const filteredList = initialTasks.filter((task) => {
-    const matchesSearch = task?.title?.toLowerCase()?.includes(searchQuery.toLowerCase());
+  const filteredList = newData.filter((task) => {
+    const matchesSearch = task?.title
+      ?.toLowerCase()
+      ?.includes(searchQuery.toLowerCase());
 
     const matchesFilter =
       isActive === "All"
@@ -237,7 +266,7 @@ const ToDo = () => {
 
     return matchesSearch && matchesFilter;
   });
-  
+
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -265,7 +294,10 @@ const ToDo = () => {
                 clearButtonMode="always"
                 onChangeText={(text) => setSearchQuery(text)}
               />
-              <TouchableOpacity style={styles.addBtn} onPress={addNavigator}>
+              <TouchableOpacity
+                style={styles.addBtn}
+                onPress={() => setIsModalOpen(true)}
+              >
                 <Text style={styles.addText}>Add</Text>
               </TouchableOpacity>
             </View>
@@ -296,6 +328,7 @@ const ToDo = () => {
           </View>
         </ImageBackground>
       </KeyboardAvoidingView>
+      <AddModal />
     </View>
   );
 };

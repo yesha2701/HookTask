@@ -7,7 +7,6 @@
 
 import { StatusBar, StyleSheet, useColorScheme } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-// import Home from './src/screens/Home';
 import StackNavigator from "./src/navigation/StackNavigator";
 
 function App() {
