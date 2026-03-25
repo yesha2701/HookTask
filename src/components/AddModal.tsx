@@ -118,8 +118,6 @@ const AddModal = () => {
       createdAt: IsoFormattedDate,
     };
 
-    console.log("multiParam :>> ", multiParam);
-
     try {
       const existingDataString = await AsyncStorage.getItem('user');
       let existingData = existingDataString ? JSON.parse(existingDataString) : [];
