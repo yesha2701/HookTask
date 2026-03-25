@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   FlatList,
   Image,
@@ -17,8 +18,8 @@ import { Text } from "react-native-gesture-handler";
 import Moment from "moment";
 import {
   useFocusEffect,
+  useIsFocused,
   useNavigation,
-  useRoute,
 } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AddModal from "../components/AddModal";
@@ -178,81 +179,61 @@ const prioBackground = (priority: "High" | "Medium" | "Low") => {
   }
 };
 
-const Item = ({ item }) => {
-  const fomatDate = Moment(item.createdAt)?.format("DD/MM/YYYY");
-
-  return (
-    <View style={[styles.listView, styles.dropShadow]}>
-      <View style={styles.infoView}>
-        <Text style={styles.infoText}>{item.title}</Text>
-        <View style={styles.dateView}>
-          <Image source={icons.calender} />
-          <Text style={styles.dateText}>{fomatDate}</Text>
-        </View>
-      </View>
-      <View>
-        <View style={styles.logoIconView}>
-          <View style={[iconBg(item.status), styles.iconView]}>
-            <Image source={isComplete(item.status)} style={styles.statusIcon} />
-          </View>
-        </View>
-        <View style={[styles.priorityView, prioBackground(item.priority)]}>
-          <Text style={[styles.priorityText, isPriority(item.priority)]}>
-            {item.priority}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-};
 const ToDo = () => {
   const { isModalOpen, setIsModalOpen } = useContext(ModalContext);
-  const [newData,setNewData] = useState([])
+  const [newData, setNewData] = useState([]);
+  const [isActive, setIsActive] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const navigation = useNavigation();
-  const route = useRoute();
 
-  const storeExistedData = async () => {
-    // const existing = await AsyncStorage.getItem("user");
-    try{
-      // if (!existing) {
-        await AsyncStorage.setItem("user", JSON.stringify(initialTasks));
-      // }
-      }
-   catch (e) {
-      console.log("Error:", e);
+const storeExistedData = async () => {
+  try {
+    const existing = await AsyncStorage.getItem("userData");
+    if (existing) {
+      setNewData(JSON.parse(existing));
+    } else {
+      await AsyncStorage.setItem("userData", JSON.stringify(initialTasks));
+      setNewData(initialTasks);
     }
-  };
-
-  const fetchUser = async () => {
-    try {
-      const addedData = await AsyncStorage.getItem("user");
-      console.log("addedData :>> ", addedData);
-      setNewData(JSON.parse(addedData));
-    } catch (e) {
-      console.log("Error:", e);
-    }
-  };
-
-  console.log('newData :>> ', newData);
+  } catch (e) {
+    console.log("Error:", e);
+  }
+};
 
   useEffect(() => {
     storeExistedData();
   }, []);
 
-  useEffect(()=>{
-    if(!isModalOpen){
-      fetchUser()
-    }
-  },[isModalOpen])
+const onDelete = async (id) => {
+  try {
+    const updatedData = newData.filter((x) => x.id !== id);
+    await AsyncStorage.setItem("userData", JSON.stringify(updatedData));
+    setNewData(updatedData);
+  } catch (e) {
+    console.log("Error on Delete :>> ", e);
+  }
+};
 
-  const [isActive, setIsActive] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
+const createTwoButtonAlert = async(id) =>
+    Alert.alert('Are you sure?', 'Please Re-assure', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {text: 'OK', onPress: () => onDelete(id)},
+    ]);
 
   const stackNavigator = () => {
     return navigation.goBack();
   };
 
-  const filteredList = newData.filter((task) => {
+  const onUpdate = async(id) => {
+    const existdata = 
+  }
+
+  const filteredList = newData?.filter((task) => {
     const matchesSearch = task?.title
       ?.toLowerCase()
       ?.includes(searchQuery.toLowerCase());
@@ -266,6 +247,47 @@ const ToDo = () => {
 
     return matchesSearch && matchesFilter;
   });
+
+  const Item = ({ item }: itemProp) => {
+    const fomatDate = Moment(item.createdAt)?.format("DD/MM/YYYY");
+
+    return (
+      <View style={[styles.listView, styles.dropShadow]}>
+        <View style={styles.infoView}>
+          <Text style={styles.infoText}>{item.title}</Text>
+          <View style={styles.dateView}>
+            <Image source={icons.calender} />
+            <Text style={styles.dateText}>{fomatDate}</Text>
+          </View>
+        </View>
+        <View style={styles.mainIconsView}>
+          <View>
+            <View style={styles.logoIconView}>
+              <View style={[iconBg(item.status), styles.iconView]}>
+                <Image
+                  source={isComplete(item.status)}
+                  style={styles.statusIcon}
+                />
+              </View>
+            </View>
+            <View style={[styles.priorityView, prioBackground(item.priority)]}>
+              <Text style={[styles.priorityText, isPriority(item.priority)]}>
+                {item.priority}
+              </Text>
+            </View>
+          </View>
+          <View style={styles.updateDeleteView}>
+            <TouchableOpacity onPress={() => onUpdate(item.id)}>
+              <Image source={icons.edit}/>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => createTwoButtonAlert(item.id)}>
+              <Image source={icons.delete} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -328,7 +350,7 @@ const ToDo = () => {
           </View>
         </ImageBackground>
       </KeyboardAvoidingView>
-      <AddModal />
+      <AddModal setNewData={setNewData} />
     </View>
   );
 };

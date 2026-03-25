@@ -5,8 +5,11 @@ import { horizontalScale, moderateScale, verticalScale,} from "../Themes/Metrics
 export const styles = StyleSheet.create({
     mainView:{
         flex:1,
-        paddingTop:verticalScale(80),
-        padding:moderateScale(15),
+        marginTop:verticalScale(70),
+        padding:moderateScale(20),
+        backgroundColor:colors.lightPink,
+        borderRadius:moderateScale(20),
+        margin:moderateScale(15)
     },
     topView:{
         flexDirection:"row",
@@ -37,44 +40,36 @@ export const styles = StyleSheet.create({
     placeholderStyle:{
         color:colors.lightGrey
     },
-    startBtn:{
+    dateView:{
+        flexDirection:'row',
+        justifyContent:"space-around",
+    },
+    button:{
         alignItems:"center",
-        backgroundColor:colors.Primary,
         marginTop:verticalScale(30),
         paddingHorizontal:horizontalScale(40),
         paddingVertical:verticalScale(15),
         borderRadius:moderateScale(14),
-        marginHorizontal: horizontalScale(10)
     },
     btnText:{
-        color:colors.white,
         fontSize:moderateScale(20),
         fontWeight:"bold",
         textAlign: 'center',
         flex: 1,
     },
-    dateView:{
-        flexDirection:'row',
-        justifyContent:"space-around",
-        gap:moderateScale(20),
-    },
-    cancelbtn:{
-        alignItems:"center",
-        marginTop:verticalScale(30),
-        paddingHorizontal:horizontalScale(50),
-        paddingVertical:verticalScale(15),
-        borderRadius:moderateScale(14),
-       backgroundColor:colors.lightPurple,
-    },
-    textCancel:{
-        fontSize:moderateScale(20),
-        fontWeight:"bold",
-        textAlign: 'center',
-        flex: 1,
-        color:colors.Primary,
-    },
-     selectedBtn:{
+    
+    
+     submitBtn:{
         backgroundColor:colors.Primary,  
+    },
+    cancelBtn:{
+        backgroundColor:colors.lightPurple
+    },
+    submitText:{
+        color:colors.white 
+    },
+    cancelText:{
+        color:colors.Primary
     },
     errorText:{
         color:colors.red,
