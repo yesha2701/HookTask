@@ -6,5 +6,7 @@ export const icons = {
     checked:require("../icons/checked.png"),
     calender:require("../icons/calendar.png"),
     upArrow:require("../icons/up-arrow.png"),
-    downArrow:require("../icons/down-arrow.png")
+    downArrow:require("../icons/down-arrow.png"),
+    edit:require("../icons/edit.png"),
+    delete:require("../icons/delete.png"),
 };

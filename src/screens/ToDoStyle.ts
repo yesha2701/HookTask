@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
         fontWeight:"500",
     },
     logoIconView:{
-        paddingBottom:verticalScale(10)
+        paddingBottom:verticalScale(10),
     },
     iconView:{
         borderRadius:moderateScale(7),
@@ -147,4 +147,11 @@ export const styles = StyleSheet.create({
         alignSelf:"center",
         color:colors.Primary,
     },
+    mainIconsView:{
+        flexDirection:"row"
+    },
+    updateDeleteView:{
+        justifyContent:"space-between",
+        marginLeft:horizontalScale(10),
+    }
 });

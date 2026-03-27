@@ -13,4 +13,5 @@ export const colors = {
     lightOrange:'#FFE9E1',
     lightPrimaryBlue:'#E3F2FF',
     red:'red',
+    backdrop:'#4e4d50cc',
 };

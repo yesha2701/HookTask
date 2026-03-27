@@ -9,6 +9,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Modal,
+  Alert,
 } from "react-native";
 import { styles } from "./AddModelStyle";
 import { Dropdown } from "react-native-element-dropdown";
@@ -16,8 +17,9 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Moment from "moment";
 import { ModalContext } from "../screens/AddModalContext";
+import { colors } from "../Themes/Colors";
 
-const AddModal = () => {
+const AddModal = ({setNewData}) => {
   const { isModalOpen, setIsModalOpen } = useContext(ModalContext);
 
   const Options = [
@@ -119,18 +121,21 @@ const AddModal = () => {
     };
 
     try {
-      const existingDataString = await AsyncStorage.getItem('user');
+      const existingDataString = await AsyncStorage.getItem("userData");
       let existingData = existingDataString ? JSON.parse(existingDataString) : [];
-      console.log('existingData :>> ', existingData);
 
       if (Array.isArray(existingData)) { 
-        existingData.push(multiParam);
-        console.log('existingData :>> ', existingData);
+        if(existingData.map(x=>x.id).includes(multiParam.id)){
+          Alert.alert("Id already existed");
+        }else{
+          existingData.push(multiParam)
+        }
     } else {
       console.error("Existing data is not an array. Cannot push new data.");
       return;
     }
-    await AsyncStorage.setItem('user', JSON.stringify(existingData));
+    await AsyncStorage.setItem("userData", JSON.stringify(existingData));
+    setNewData(existingData)
     console.log('Data successfully updated and saved');
     } catch (error) {
       console.log(error);
@@ -138,7 +143,7 @@ const AddModal = () => {
   };
 
   return (
-    <Modal visible={isModalOpen} onRequestClose={() => setIsModalOpen(false)}>
+    <Modal visible={isModalOpen} animationType="slide" backdropColor={colors.backdrop} onRequestClose={() => setIsModalOpen(false)}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -151,7 +156,8 @@ const AddModal = () => {
                 placeholder="Enter Your id"
                 value={id}
                 style={styles.textInput}
-                onChangeText={setId}
+                keyboardType="number-pad"
+                onChangeText={(text)=>{setId(text.replace(/[^0-9]/g, ''))}}
               />
               {errors.field === "id" && (
                 <Text style={styles.errorText}>{errors.message}</Text>
@@ -219,7 +225,8 @@ const AddModal = () => {
                 placeholder="Enter durationSeconds"
                 style={styles.textInput}
                 value={duration}
-                onChangeText={setDuration}
+                keyboardType="number-pad"
+                onChangeText={(text)=>{setDuration(text.replace(/[^0-9]/g, ''))}}
               />
               {errors.field === "duration" && (
                 <Text style={styles.errorText}>{errors.message}</Text>
@@ -229,8 +236,9 @@ const AddModal = () => {
                 placeholder="Enter remainingSeconds"
                 style={styles.textInput}
                 value={remaining}
-                onChangeText={setRemaining}
-              />
+                keyboardType="number-pad"
+                onChangeText={(text)=>{setRemaining(text.replace(/[^0-9]/g, ''))}}
+                              />
               {errors.field === "remaining" && (
                 <Text style={styles.errorText}>{errors.message}</Text>
               )}
@@ -252,16 +260,16 @@ const AddModal = () => {
             </View>
             <View style={styles.dateView}>
               <TouchableOpacity
-                style={styles.startBtn}
+                style={[styles.button,styles.submitBtn]}
                 onPress={validationForm}
               >
-                <Text style={styles.btnText}>Submit</Text>
+                <Text style={[styles.btnText,styles.submitText]}>Submit</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.cancelbtn}
+                style={[styles.button,styles.cancelBtn]}
                 onPress={() => setIsModalOpen(false)}
               >
-                <Text style={styles.textCancel}>cancel</Text>
+                <Text style={[styles.btnText,styles.cancelText]}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
