@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   Alert,
-  Button,
   FlatList,
   Image,
   ImageBackground,
@@ -229,10 +228,6 @@ const createTwoButtonAlert = async(id) =>
     return navigation.goBack();
   };
 
-  const onUpdate = async(id) => {
-    const existdata = 
-  }
-
   const filteredList = newData?.filter((task) => {
     const matchesSearch = task?.title
       ?.toLowerCase()
@@ -277,8 +272,8 @@ const createTwoButtonAlert = async(id) =>
             </View>
           </View>
           <View style={styles.updateDeleteView}>
-            <TouchableOpacity onPress={() => onUpdate(item.id)}>
-              <Image source={icons.edit}/>
+            <TouchableOpacity>
+              <Image source={icons.edit} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => createTwoButtonAlert(item.id)}>
               <Image source={icons.delete} />
