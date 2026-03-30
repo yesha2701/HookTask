@@ -218,7 +218,7 @@ const ToDo = () => {
   };
 
   const createTwoButtonAlert = async (id) =>
-    Alert.alert("Are you sure?", "Please Re-assure", [
+    Alert.alert("Are you sure?", "Please Re-Assure", [
       {
         text: "Cancel",
         onPress: () => console.log("Cancel Pressed"),
