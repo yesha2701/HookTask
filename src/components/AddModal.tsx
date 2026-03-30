@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   Platform,
-  Image,
   TextInput,
   ScrollView,
   KeyboardAvoidingView,
@@ -200,6 +199,7 @@ const AddModal = ({ value }) => {
                 value={id}
                 style={styles.textInput}
                 keyboardType="number-pad"
+                editable={isEdit===true?false:true}
                 onChangeText={(text) => {
                   setId(text.replace(/[^0-9]/g, ""));
                 }}
