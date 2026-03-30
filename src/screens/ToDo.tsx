@@ -23,6 +23,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AddModal from "../components/AddModal";
 import { ModalContext } from "./AddModalContext";
+import { Modal } from "react-native/types_generated/index";
 
 interface detail {
   id: string;
@@ -183,49 +184,69 @@ const ToDo = () => {
   const [newData, setNewData] = useState([]);
   const [isActive, setIsActive] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [onEditData,setOnEditData] = useState({});
+  const [isEdit,setIsEdit]=useState(false)
 
   const navigation = useNavigation();
 
-const storeExistedData = async () => {
-  try {
-    const existing = await AsyncStorage.getItem("userData");
-    if (existing) {
-      setNewData(JSON.parse(existing));
-    } else {
-      await AsyncStorage.setItem("userData", JSON.stringify(initialTasks));
-      setNewData(initialTasks);
+  const storeExistedData = async () => {
+    try {
+      const existing = await AsyncStorage.getItem("userData");
+      if (existing) {
+        setNewData(JSON.parse(existing));
+      } else {
+        await AsyncStorage.setItem("userData", JSON.stringify(initialTasks));
+        setNewData(initialTasks);
+      }
+    } catch (e) {
+      console.log("Error:", e);
     }
-  } catch (e) {
-    console.log("Error:", e);
-  }
-};
+  };
 
   useEffect(() => {
     storeExistedData();
   }, []);
 
-const onDelete = async (id) => {
-  try {
-    const updatedData = newData.filter((x) => x.id !== id);
-    await AsyncStorage.setItem("userData", JSON.stringify(updatedData));
-    setNewData(updatedData);
-  } catch (e) {
-    console.log("Error on Delete :>> ", e);
-  }
-};
+  const onDelete = async (id) => {
+    try {
+      const updatedData = newData.filter((x) => x.id !== id);
+      await AsyncStorage.setItem("userData", JSON.stringify(updatedData));
+      setNewData(updatedData);
+    } catch (e) {
+      console.log("Error on Delete :>> ", e);
+    }
+  };
 
-const createTwoButtonAlert = async(id) =>
-    Alert.alert('Are you sure?', 'Please Re-assure', [
+  const createTwoButtonAlert = async (id) =>
+    Alert.alert("Are you sure?", "Please Re-assure", [
       {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
       },
-      {text: 'OK', onPress: () => onDelete(id)},
+      { text: "OK", onPress: () => onDelete(id) },
     ]);
 
   const stackNavigator = () => {
     return navigation.goBack();
+  };
+
+  const onUpdate = (id) => {
+    setIsModalOpen(true);
+    setIsEdit(true);
+    try{
+      const fetchedData =  newData?.find((x)=>x.id === id);
+      setOnEditData(fetchedData);
+    }catch(e){
+      console.log('Error on Update :>> ', e);
+    }
+  };
+
+  const propGroup = {
+    setNewData:setNewData, 
+    onEditData:onEditData, 
+    setIsEdit:setIsEdit,
+    isEdit:isEdit,
   };
 
   const filteredList = newData?.filter((task) => {
@@ -272,7 +293,7 @@ const createTwoButtonAlert = async(id) =>
             </View>
           </View>
           <View style={styles.updateDeleteView}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => onUpdate(item.id)}>
               <Image source={icons.edit} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => createTwoButtonAlert(item.id)}>
@@ -345,7 +366,7 @@ const createTwoButtonAlert = async(id) =>
           </View>
         </ImageBackground>
       </KeyboardAvoidingView>
-      <AddModal setNewData={setNewData} />
+      <AddModal value={propGroup}/>
     </View>
   );
 };

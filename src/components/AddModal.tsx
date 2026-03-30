@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -19,8 +19,9 @@ import Moment from "moment";
 import { ModalContext } from "../screens/AddModalContext";
 import { colors } from "../Themes/Colors";
 
-const AddModal = ({setNewData}) => {
+const AddModal = ({ value }) => {
   const { isModalOpen, setIsModalOpen } = useContext(ModalContext);
+  const { setNewData, onEditData, setIsEdit, isEdit } = value;
 
   const Options = [
     { label: "High", value: "High" },
@@ -38,8 +39,8 @@ const AddModal = ({setNewData}) => {
   const [priority, setPriority] = useState("");
   const [status, setStatus] = useState("");
   const [category, setCategory] = useState("");
-  const [duration, setDuration] = useState("");
-  const [remaining, setRemaining] = useState("");
+  const [durationSeconds, setDuration] = useState("");
+  const [remainingSeconds, setRemaining] = useState("");
   const [errors, setErrors] = useState({ field: "", message: "" });
 
   const validationForm = () => {
@@ -65,26 +66,20 @@ const AddModal = ({setNewData}) => {
       formError.field = "category";
       formError.message = "category is Required";
       setErrors(formError);
-    } else if (duration === "") {
-      formError.field = "duration";
-      formError.message = "duration is Required";
+    } else if (durationSeconds === "") {
+      formError.field = "durationSeconds";
+      formError.message = "durationSeconds is Required";
       setErrors(formError);
-    } else if (remaining === "") {
+    } else if (remainingSeconds === "") {
       formError.field = "remaining";
       formError.message = "remaining is Required";
       setErrors(formError);
     } else {
       setErrors({ field: "", message: "" });
-      handleOnGoBack();
+      handleOnSubmit();
       setIsModalOpen(false);
     }
-    setId("");
-    setTitle("");
-    setPriority("");
-    setStatus("");
-    setCategory("");
-    setDuration("");
-    setRemaining("");
+    
   };
 
   const [date, setDate] = useState(new Date());
@@ -108,42 +103,90 @@ const AddModal = ({setNewData}) => {
     "YYYY-MM-DDTHH:mm:ss",
   );
 
-  const handleOnGoBack = async () => {
+  const handleOnSubmit = async () => {
     const multiParam = {
       id: id,
       title: title,
       priority: priority,
       status: status,
       category: category,
-      durationSeconds: duration,
-      remainingSeconds: remaining,
+      durationSeconds: durationSeconds,
+      remainingSeconds: remainingSeconds,
       createdAt: IsoFormattedDate,
     };
 
     try {
       const existingDataString = await AsyncStorage.getItem("userData");
-      let existingData = existingDataString ? JSON.parse(existingDataString) : [];
+      let existingData = existingDataString
+        ? JSON.parse(existingDataString)
+        : [];
 
-      if (Array.isArray(existingData)) { 
-        if(existingData.map(x=>x.id).includes(multiParam.id)){
-          Alert.alert("Id already existed");
-        }else{
-          existingData.push(multiParam)
+      if (isEdit === true) {
+        const updateTitle = existingData.map((item) => {
+          if (item.id === onEditData.id) {
+            return { ...item, title };
+          }
+          return item;
+        });
+        await AsyncStorage.setItem("userData", JSON.stringify(updateTitle));
+        setNewData(updateTitle);
+      } else {
+        if (Array.isArray(existingData)) {
+          if (existingData.map((x) => x.id).includes(multiParam.id)) {
+            Alert.alert("Id already existed");
+          } else {
+            existingData.push(multiParam);
+          }
+        } else {
+          console.error("Existing data is not an array. Cannot push new data.");
+          return;
         }
-    } else {
-      console.error("Existing data is not an array. Cannot push new data.");
-      return;
-    }
-    await AsyncStorage.setItem("userData", JSON.stringify(existingData));
-    setNewData(existingData)
-    console.log('Data successfully updated and saved');
+        await AsyncStorage.setItem("userData", JSON.stringify(existingData));
+        setNewData(existingData);
+      }
+      console.log("Data successfully updated and saved");
+      setId("");
+    setTitle("");
+    setPriority("");
+    setStatus("");
+    setCategory("");
+    setDuration("");
+    setRemaining("");
     } catch (error) {
       console.log(error);
     }
   };
 
+  useEffect(() => {
+    if (isEdit === true) {
+      setId(onEditData.id),
+      setTitle(onEditData.title),
+      setPriority(onEditData.priority);
+      setStatus(onEditData.status);
+      setCategory(onEditData.category);
+      setDuration(onEditData.durationSeconds.toString());
+      setRemaining(onEditData.remainingSeconds.toString());
+      setDate(onEditData.createdAt);
+    } else {
+      setId(""), setTitle(""), setPriority(""), setStatus("");
+      setCategory("");
+      setDuration("");
+      setRemaining("");
+    }
+  }, [isEdit]);
+
+  const onCancel = () => {
+    setIsModalOpen(false);
+    setIsEdit(false);
+  };
+
   return (
-    <Modal visible={isModalOpen} animationType="slide" backdropColor={colors.backdrop} onRequestClose={() => setIsModalOpen(false)}>
+    <Modal
+      visible={isModalOpen}
+      animationType="slide"
+      backdropColor={colors.backdrop}
+      onRequestClose={() => setIsModalOpen(false)}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -157,7 +200,9 @@ const AddModal = ({setNewData}) => {
                 value={id}
                 style={styles.textInput}
                 keyboardType="number-pad"
-                onChangeText={(text)=>{setId(text.replace(/[^0-9]/g, ''))}}
+                onChangeText={(text) => {
+                  setId(text.replace(/[^0-9]/g, ""));
+                }}
               />
               {errors.field === "id" && (
                 <Text style={styles.errorText}>{errors.message}</Text>
@@ -224,21 +269,25 @@ const AddModal = ({setNewData}) => {
               <TextInput
                 placeholder="Enter durationSeconds"
                 style={styles.textInput}
-                value={duration}
+                value={durationSeconds}
                 keyboardType="number-pad"
-                onChangeText={(text)=>{setDuration(text.replace(/[^0-9]/g, ''))}}
+                onChangeText={(text) => {
+                  setDuration(text.replace(/[^0-9]/g, ""));
+                }}
               />
-              {errors.field === "duration" && (
+              {errors.field === "durationSeconds" && (
                 <Text style={styles.errorText}>{errors.message}</Text>
               )}
               <Text style={styles.text}>RemainingSeconds</Text>
               <TextInput
                 placeholder="Enter remainingSeconds"
                 style={styles.textInput}
-                value={remaining}
+                value={remainingSeconds}
                 keyboardType="number-pad"
-                onChangeText={(text)=>{setRemaining(text.replace(/[^0-9]/g, ''))}}
-                              />
+                onChangeText={(text) => {
+                  setRemaining(text.replace(/[^0-9]/g, ""));
+                }}
+              />
               {errors.field === "remaining" && (
                 <Text style={styles.errorText}>{errors.message}</Text>
               )}
@@ -260,16 +309,16 @@ const AddModal = ({setNewData}) => {
             </View>
             <View style={styles.dateView}>
               <TouchableOpacity
-                style={[styles.button,styles.submitBtn]}
+                style={[styles.button, styles.submitBtn]}
                 onPress={validationForm}
               >
-                <Text style={[styles.btnText,styles.submitText]}>Submit</Text>
+                <Text style={[styles.btnText, styles.submitText]}>Submit</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.button,styles.cancelBtn]}
-                onPress={() => setIsModalOpen(false)}
+                style={[styles.button, styles.cancelBtn]}
+                onPress={onCancel}
               >
-                <Text style={[styles.btnText,styles.cancelText]}>Cancel</Text>
+                <Text style={[styles.btnText, styles.cancelText]}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
