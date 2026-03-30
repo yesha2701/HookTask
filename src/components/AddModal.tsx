@@ -143,7 +143,7 @@ const AddModal = ({ value }) => {
         await AsyncStorage.setItem("userData", JSON.stringify(existingData));
         setNewData(existingData);
       }
-      console.log("Data successfully updated and saved");
+      console.log("Data successfully saved and updated");
       setId("");
     setTitle("");
     setPriority("");
